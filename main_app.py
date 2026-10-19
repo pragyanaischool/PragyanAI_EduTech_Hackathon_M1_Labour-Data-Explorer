@@ -11,7 +11,7 @@ st.set_page_config(
     page_icon="🏛️",
     layout="wide"
 )
-st.image("")
+st.image("PragyanAI_Transperent.png")
 EXPECTED_CSVS = [
     "00_DATASET_INVENTORY.csv",
     "01_labour_market_indicators.csv",
