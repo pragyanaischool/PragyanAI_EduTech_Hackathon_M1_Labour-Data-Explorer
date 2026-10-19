@@ -11,7 +11,13 @@ st.set_page_config(
     page_icon="🏛️",
     layout="wide"
 )
-st.image("PragyanAI_Transperent.png")
+
+# Header Logo and Branding
+try:
+    st.image("PragyanAI_Transperent.png", width=140)
+except Exception:
+    st.markdown("###  PragyanAI Platform")
+
 EXPECTED_CSVS = [
     "00_DATASET_INVENTORY.csv",
     "01_labour_market_indicators.csv",
@@ -77,12 +83,12 @@ with st.sidebar.form("quick_upload_form", clear_on_submit=True):
             else:
                 ingest_df = pd.read_excel(uploaded_file)
             
-            # Process & Clean
+            # Process & Clean Headers
             ingest_df.columns = [str(c).strip().lower().replace(" ", "_") for c in ingest_df.columns]
             ingest_df['uploaded_by'] = uploader_name
             ingest_df['upload_timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             
-            # Dump to SQLite
+            # Dump to SQLite Database
             conn = sqlite3.connect("data/labour_platform.db")
             ingest_df.to_sql(target_tbl, conn, if_exists="append", index=False)
             conn.close()
@@ -100,7 +106,7 @@ missing_files = check_missing_files()
 
 if missing_files:
     st.warning(f"⚠️ Notice: {len(missing_files)} core dataset file(s) are missing from the local repository.")
-    with st.expander(" Resolve Missing Datasets (Direct Upload or Google Drive Link)", expanded=True):
+    with st.expander("📥 Resolve Missing Datasets (Direct Upload or Google Drive Link)", expanded=True):
         st.markdown("You can upload missing CSV files directly or import them via a shared public Google Drive download link.")
         
         uploaded_missing = st.file_uploader("Upload missing CSV dataset(s):", type=["csv"], accept_multiple_files=True)
