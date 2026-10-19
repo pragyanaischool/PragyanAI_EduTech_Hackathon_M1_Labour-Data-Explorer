@@ -1,0 +1,18 @@
+# Core LangChain Framework
+langchain
+langchain-core
+langchain-community
+
+# Integrations (HuggingFace & Groq)
+langchain-huggingface
+langchain-groq
+
+# Vector Search & Embeddings
+faiss-cpu
+sentence-transformers
+
+# Application Interface & Data Utilities
+streamlit
+pandas
+plotly
+python-dotenv
