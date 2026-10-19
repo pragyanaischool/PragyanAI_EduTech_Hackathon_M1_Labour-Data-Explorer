@@ -7,7 +7,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 
 st.title("PragyanAI - Multi-User Data & Document Upload Portal")
-st.image("")
+st.image("PragyanAI_Transperent.png")
 st.markdown("Specify your user identity, select a data category, and ingest structured CSV tables directly into the SQLite database or unstructured documents into the FAISS vector repository.")
 
 VECTOR_INDEX_DIR = "data/vector_index"
