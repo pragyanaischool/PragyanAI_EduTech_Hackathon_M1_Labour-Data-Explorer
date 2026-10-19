@@ -6,7 +6,8 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 
-st.title(" Multi-User Data & Document Upload Portal")
+st.title("PragyanAI - Multi-User Data & Document Upload Portal")
+st.image("")
 st.markdown("Specify your user identity, select a data category, and ingest structured CSV tables directly into the SQLite database or unstructured documents into the FAISS vector repository.")
 
 VECTOR_INDEX_DIR = "data/vector_index"
@@ -24,6 +25,11 @@ with col2:
             "district_sector_economy", 
             "college_master", 
             "training_institute_master", 
+            "courses_skill_mapping",
+            "training_batches_outcomes",
+            "employer_master",
+            "job_vacancies",
+            "job_fair_events",
             "custom_user_survey"
         ]
     )
