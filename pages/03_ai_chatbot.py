@@ -8,7 +8,7 @@ from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage, SystemMessage
 
 st.title(" PragyanAI - Deep Insight Analytics Chatbot (Groq RAG)")
-st.image("")
+st.image("PragyanAI_Transperent.png")
 st.markdown("Ask advanced analytical questions across all active platform databases and user document archives[cite: 1, 2].")
 
 VECTOR_INDEX_DIR = "data/vector_index"
