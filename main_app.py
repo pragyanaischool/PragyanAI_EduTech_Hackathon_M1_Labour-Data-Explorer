@@ -205,10 +205,10 @@ if missing_files:
                 except Exception as e:
                     st.error(f"Download error: {e}")
 
-# Multi-Page Navigation Router
+# Multi-Page Navigation Router (Pointing correctly to 'main_app.py')
 pages = st.navigation({
     "Start & Ingestion": [
-        st.Page("app.py", title="Start & Bulk Ingestion Hub", icon="🏠"),
+        st.Page("main_app.py", title="Start & Bulk Ingestion Hub", icon="🏠"),
     ],
     "Analytics Hub": [
         st.Page("pages/01_dashboard.py", title="Deep Analytics Dashboard", icon="📊"),
