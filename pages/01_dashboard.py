@@ -4,7 +4,7 @@ import sqlite3
 import plotly.express as px
 
 st.title("PragyanAI - Multi-Domain Data & Advanced Analytics Explorer")
-st.image("")
+st.image("PragyanAI_Transperent.png")
 st.markdown("Explore regional metrics across all platform datasets with publication-ready charts and export comprehensive analysis reports in Markdown (.md) format.")
 
 @st.cache_data
