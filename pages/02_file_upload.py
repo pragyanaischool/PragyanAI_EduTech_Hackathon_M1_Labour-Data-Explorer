@@ -2,13 +2,30 @@ import streamlit as st
 import pandas as pd
 import sqlite3
 import os
+from datetime import datetime
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 
-st.title("PragyanAI - Multi-User Data & Document Upload Portal")
-st.image("PragyanAI_Transperent.png")
-st.markdown("Specify your user identity, select a data category, and ingest structured CSV tables directly into the SQLite database or unstructured documents into the FAISS vector repository.")
+# --- PAGE CONFIGURATION & BRANDING ---
+st.set_page_config(
+    page_title="PragyanAI Data & Document Ingestion Portal",
+    page_icon="📁",
+    layout="wide"
+)
+
+# Header Logo and Title Layout
+header_col1, header_col2 = st.columns([1, 4])
+with header_col1:
+    try:
+        st.image("PragyanAI_Transperent.png", width=130)
+    except Exception:
+        st.markdown("###  PragyanAI")
+with header_col2:
+    st.title("PragyanAI - Multi-User Data & Document Upload Portal")
+    st.markdown("Specify your user identity, select a data category, and ingest structured CSV/Excel tables directly into SQLite or unstructured documents into FAISS vector storage.")
+
+st.divider()
 
 VECTOR_INDEX_DIR = "data/vector_index"
 
@@ -40,22 +57,27 @@ st.divider()
 st.subheader("2. Upload Source Files")
 uploaded_file = st.file_uploader(
     f"Upload files under user profile **'{username}'**", 
-    type=["csv", "txt"]
+    type=["csv", "xlsx", "txt"]
 )
 
 if uploaded_file is not None:
     file_ext = uploaded_file.name.split('.')[-1].lower()
     
-    if file_ext == 'csv':
+    if file_ext in ['csv', 'xlsx']:
         try:
-            df = pd.read_csv(uploaded_file)
+            if file_ext == 'csv':
+                df = pd.read_csv(uploaded_file)
+            else:
+                df = pd.read_excel(uploaded_file)
             
-            # Inject user and category metadata into the dataframe
+            # Normalize columns and inject metadata
+            df.columns = [str(c).strip().lower().replace(" ", "_") for c in df.columns]
             df['uploaded_by'] = username
             df['upload_category'] = category
+            df['upload_timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             
-            st.success(f"Parsed CSV successfully ({len(df):,} rows, {len(df.columns)} columns). User tag **'{username}'** assigned.")
-            st.dataframe(df.head(5))
+            st.success(f"Parsed file successfully ({len(df):,} rows, {len(df.columns)} columns). User tag **'{username}'** assigned.")
+            st.dataframe(df.head(5), use_container_width=True)
             
             target_table = st.text_input("Target SQLite Table Name:", value=category)
             
@@ -68,7 +90,7 @@ if uploaded_file is not None:
                 else:
                     st.warning("Please provide a valid table name.")
         except Exception as err:
-            st.error(f"Error processing uploaded CSV: {err}")
+            st.error(f"Error processing uploaded tabular file: {err}")
             
     elif file_ext == 'txt':
         try:
@@ -93,3 +115,20 @@ if uploaded_file is not None:
                     st.success(f"Document '{uploaded_file.name}' uploaded by **{username}** was successfully indexed into the FAISS Vector Database.")
         except Exception as err:
             st.error(f"Error embedding text document: {err}")
+
+st.divider()
+st.subheader(" Active Database Tables Overview")
+try:
+    conn = sqlite3.connect("data/labour_platform.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tables = [r[0] for r in cursor.fetchall() if r[0] != 'sqlite_sequence']
+    
+    summary_data = []
+    for t in tables:
+        cnt_df = pd.read_sql(f"SELECT COUNT(*) as cnt FROM [{t}]", conn)
+        summary_data.append({"Table Name": t, "Total Rows": cnt_df['cnt'].iloc[0]})
+    conn.close()
+    st.dataframe(pd.DataFrame(summary_data), use_container_width=True)
+except Exception as e:
+    st.info(f"Database currently uninitialized: {e}")
