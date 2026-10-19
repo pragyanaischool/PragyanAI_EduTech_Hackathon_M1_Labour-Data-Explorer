@@ -7,17 +7,18 @@ from langchain_community.vectorstores import FAISS
 from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage, SystemMessage
 
-st.title(" Deep Insight Analytics Chatbot (Groq RAG)")
+st.title(" PragyanAI - Deep Insight Analytics Chatbot (Groq RAG)")
+st.image("")
 st.markdown("Ask advanced analytical questions across all active platform databases and user document archives[cite: 1, 2].")
 
 VECTOR_INDEX_DIR = "data/vector_index"
 
-# Read Groq key from secrets
+# Read Groq API key securely from st.secrets
 groq_api_key = None
 try:
     groq_api_key = st.secrets["GROQ_API_KEY"]
 except Exception:
-    st.error(" `GROQ_API_KEY` missing from `.streamlit/secrets.toml`.")
+    st.error("⚠️ `GROQ_API_KEY` missing from `.streamlit/secrets.toml`.")
 
 if "chat_messages" not in st.session_state:
     st.session_state.chat_messages = []
@@ -33,20 +34,20 @@ if user_input := st.chat_input("Ask for deep insights, trend analysis, or region
 
     with st.chat_message("assistant"):
         if not groq_api_key:
-            reply_string = " Groq API key configuration missing."
+            reply_string = "⚠️ Groq API key configuration is missing from secrets."
             st.markdown(reply_string)
         else:
             try:
                 with st.spinner("Retrieving RAG context & querying Groq LLM..."):
-                    # 1. Retrieve FAISS context
+                    # 1. Retrieve semantic document chunks from FAISS Vector DB
                     retrieved_context = ""
                     if os.path.exists(VECTOR_INDEX_DIR):
                         hf_embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
                         faiss_store = FAISS.load_local(VECTOR_INDEX_DIR, hf_embeddings, allow_dangerous_deserialization=True)
                         docs = faiss_store.similarity_search(user_input, k=3)
-                        retrieved_context = "\n\n".join([f"\n{d.page_content}" for d in docs])
+                        retrieved_context = "\n\n".join([f"[Source: {d.metadata.get('filename')} | User: {d.metadata.get('uploaded_by')}]\n{d.page_content}" for d in docs])
 
-                    # 2. Database stats overview
+                    # 2. Extract database state and schema overview from SQLite
                     db_overview = ""
                     try:
                         conn = sqlite3.connect("data/labour_platform.db")
@@ -82,7 +83,7 @@ Guidelines for your response:
 {retrieved_context if retrieved_context else "No custom document snippets matched this query."}
 """
 
-                    # 4. Invoke Groq LLM
+                    # 4. Invoke Groq LLM via LangChain
                     groq_llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.2, groq_api_key=groq_api_key)
                     payload_messages = [SystemMessage(content=proper_system_prompt)] + [HumanMessage(content=m["content"]) for m in st.session_state.chat_messages]
                     
