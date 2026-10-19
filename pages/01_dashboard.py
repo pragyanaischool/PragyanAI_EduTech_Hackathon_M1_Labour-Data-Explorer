@@ -9,7 +9,7 @@ st.set_page_config(
     page_icon="🏛️",
     layout="wide"
 )
-st.image("")
+st.image("PragyanAI_Transperent.png")
 # Header Logo and Title Layout
 header_col1, header_col2 = st.columns([1, 4])
 with header_col1:
