@@ -127,7 +127,7 @@ if bulk_files:
 
 # --- SIDEBAR: QUICK INGESTION WIDGET ---
 st.sidebar.markdown("### 🏛️ PragyanAI Platform Hub")
-st.sidebar.markdown("Use the navigation links above to explore the Analytics Dashboard, Upload Portal, or AI Chatbot.")
+st.sidebar.markdown("Use the navigation links above to explore the Data Initialization Hub, Deep Analytics Dashboard, User Upload Portal, or AI Chatbot.")
 
 st.sidebar.divider()
 st.sidebar.markdown("### 📥 Quick Single Data Ingestion")
@@ -204,21 +204,3 @@ if missing_files:
                         st.error("Failed to download. Ensure the Google Drive link permission is set to 'Anyone with the link can view'.")
                 except Exception as e:
                     st.error(f"Download error: {e}")
-
-# Multi-Page Navigation Router (Pointing correctly to 'main_app.py')
-pages = st.navigation({
-    "Start & Ingestion": [
-        st.Page("main_app.py", title="Start & Bulk Ingestion Hub", icon="🏠"),
-    ],
-    "Analytics Hub": [
-        st.Page("pages/01_dashboard.py", title="Deep Analytics Dashboard", icon="📊"),
-    ],
-    "User Data Management": [
-        st.Page("pages/02_file_upload.py", title="User Upload Portal", icon="📁"),
-    ],
-    "AI Intelligence": [
-        st.Page("pages/03_ai_chatbot.py", title="Deep Insight Chatbot", icon="💬"),
-    ]
-})
-
-pages.run()
