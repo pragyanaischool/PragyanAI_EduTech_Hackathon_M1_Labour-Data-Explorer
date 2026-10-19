@@ -7,9 +7,25 @@ from langchain_community.vectorstores import FAISS
 from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage, SystemMessage
 
-st.title(" PragyanAI - Deep Insight Analytics Chatbot (Groq RAG)")
-st.image("PragyanAI_Transperent.png")
-st.markdown("Ask advanced analytical questions across all active platform databases and user document archives[cite: 1, 2].")
+# --- PAGE CONFIGURATION & BRANDING ---
+st.set_page_config(
+    page_title="PragyanAI Deep Insight Chatbot",
+    page_icon="💬",
+    layout="wide"
+)
+
+# Header Logo and Title Layout
+header_col1, header_col2 = st.columns([1, 4])
+with header_col1:
+    try:
+        st.image("PragyanAI_Transperent.png", width=130)
+    except Exception:
+        st.markdown("### PragyanAI")
+with header_col2:
+    st.title("PragyanAI - Deep Insight Intelligence Chatbot (Groq RAG)")
+    st.markdown("Ask advanced analytical questions across all active SQLite platform databases and vector document archives.")
+
+st.divider()
 
 VECTOR_INDEX_DIR = "data/vector_index"
 
@@ -38,7 +54,7 @@ if user_input := st.chat_input("Ask for deep insights, trend analysis, or region
             st.markdown(reply_string)
         else:
             try:
-                with st.spinner("Retrieving RAG context & querying Groq LLM..."):
+                with st.spinner("Retrieving database & vector context and querying Groq LLM..."):
                     # 1. Retrieve semantic document chunks from FAISS Vector DB
                     retrieved_context = ""
                     if os.path.exists(VECTOR_INDEX_DIR):
@@ -57,8 +73,8 @@ if user_input := st.chat_input("Ask for deep insights, trend analysis, or region
                         
                         summaries = []
                         for t in tables:
-                            t_df = pd.read_sql(f"SELECT COUNT(*) as cnt FROM {t}", conn)
-                            summaries.append(f"- Table `{t}`: {t_df['cnt'].iloc[0]} rows")
+                            t_df = pd.read_sql(f"SELECT COUNT(*) as cnt FROM [{t}]", conn)
+                            summaries.append(f"- Table `{t}`: {t_df['cnt'].iloc[0]:,} rows")
                         conn.close()
                         db_overview = "Active Database Tables:\n" + "\n".join(summaries)
                     except Exception:
@@ -66,9 +82,9 @@ if user_input := st.chat_input("Ask for deep insights, trend analysis, or region
 
                     # 3. Production-Grade Deep Analytics System Prompt
                     proper_system_prompt = f"""
-You are the Chief Senior Workforce Economist and Multi-Domain Data Intelligence Consultant for the KSISU and KSIWAP platform.
+You are the Chief Senior Workforce Economist and Multi-Domain Data Intelligence Consultant for the PragyanAI platform.
 
-Your task is to analyze user questions across multiple dimensions: labour indicators, district sector economies, higher-education college databases, training institute master records[cite: 1, 2], and user uploads.
+Your task is to analyze user questions across multiple SQLite database tables and vector document archives.
 
 Guidelines for your response:
 1. **Analytical Rigor:** Break down complex trends into clear demographic, regional, or structural components.
@@ -84,7 +100,7 @@ Guidelines for your response:
 """
 
                     # 4. Invoke Groq LLM via LangChain
-                    groq_llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.2, groq_api_key=groq_api_key)
+                    groq_llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0.2, groq_api_key=groq_api_key)
                     payload_messages = [SystemMessage(content=proper_system_prompt)] + [HumanMessage(content=m["content"]) for m in st.session_state.chat_messages]
                     
                     llm_response = groq_llm.invoke(payload_messages)
